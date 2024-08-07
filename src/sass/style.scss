@@ -1,0 +1,33 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+body {
+  margin: 50px auto;
+  width: 75%;
+  background: rgb(238, 238, 238);
+  background: linear-gradient(
+    90deg,
+     #ffffff 50%,
+     #eeeeee 50%
+  );
+  .main {
+    display: flex;
+    div {
+      margin: 20px 20px;
+    }
+    .input {
+      width: 50%;
+      textarea {
+        max-width: 90%;
+      }
+      button {
+        display: block;
+      }
+    }
+    .output {
+      max-width: 50%;
+    }
+  }
+}
