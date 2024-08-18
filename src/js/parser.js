@@ -93,7 +93,7 @@ function parseTextStructure(t) {
   const lastKeyPattern = /\[(("\w*\")|\d+)\]=>(?!.*\[(("\w*")|\d+)\]=>)/;
   const stringValuePattern = /".*?"/;
   const otherValuePattern = /\((.*?)\)/;
-  const arrayPattern = /{.*[^}]/;
+  const arrayTypePattern = /array\(\d*\)/;
 
   for (let i = 0; i < text.length; i++) {
     const newText = text.slice(i).trim();
@@ -124,12 +124,13 @@ function parseTextStructure(t) {
         const floatValue = newText.match(otherValuePattern)[1];
         output = {
           ...output,
-          [keyFloat]: { type: "int", value: parseFloat(floatValue) },
+          [keyFloat]: { type: "float", value: parseFloat(floatValue) },
         };
       } else if (newText.startsWith("bool")) {
         const textBeforeIBool = text.slice(0, i);
         const keyBool = textBeforeIBool.match(lastKeyPattern)[1];
         const boolValue = newText.match(otherValuePattern)[1];
+
         output = {
           ...output,
           [keyBool]: {
@@ -139,11 +140,16 @@ function parseTextStructure(t) {
         };
       } else if (newText.startsWith("array")) {
         const textBeforeIArr = text.slice(0, i);
+        const arrayTypeLength = newText.match(arrayTypePattern)[0].length;
         const keyArray =
           textBeforeIArr === ""
             ? null
             : textBeforeIArr.match(lastKeyPattern)[1];
         const arrayContent = extractNestedBraces(newText);
+        // console.log("nt: ", newText)
+        //   console.log("key: ", textBeforeIArr.match(lastKeyPattern))
+        //   console.log("textBeforeIArr: ", textBeforeIArr )
+        //debugger;
         output =
           textBeforeIArr === ""
             ? { type: "array", value: parseTextStructure(arrayContent) }
@@ -154,9 +160,12 @@ function parseTextStructure(t) {
                   value: parseTextStructure(arrayContent),
                 },
               };
+
+        i = i + arrayContent.length + arrayTypeLength;
+        //debugger;
       }
     }
   }
   console.log(output);
+  return output;
 }
-
