@@ -1,5 +1,5 @@
 
-import parser from "./parser.js";
+import { parser } from "./parser.js";
 
 const app = {
   init: function () {
@@ -14,7 +14,6 @@ const app = {
 
     function handleInputChange(e) {
       thisApp.input = e.target.value;
-    
     }
 
     function handleSubmit() {
