@@ -1,11 +1,13 @@
 export function parser(text) {
+  let object = {}
+  let result = ""
   const stringToParse = text.trim();
-  const object = parseTextStructure(stringToParse);
-  const result = parseObjectToOutput(object);
+  object = parseTextStructure(stringToParse);
+  result = parseObjectToOutput(object);
 
   const isEmptyObject = Object.keys(object).length === 0;
-  console.log(object)
-  if (isEmptyObject || object === undefined || object.error ||JSON.stringify(result) === "[]") {
+  console.log(result)
+  if (isEmptyObject || object === undefined || object.error ||result === "") {
    //debugger;
 
     return "Unable to parse your input. Please ensure you're passing the correct var_dump output. Double-check the format and try again."
