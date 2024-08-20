@@ -183,9 +183,6 @@ describe("parse text to object test", () => {
     expect(
       parseTextStructure(`array {"klucz"=>string(7) "wartosc"`)
     ).to.deep.equal({ error: "Failed to parse text structure." });
-    expect(
-      parseTextStructure(`array {"klucz"=>string(7) "wartosc"`)
-    ).to.deep.equal({ error: "Failed to parse text structure." });
   });
   it("should return empty object when empty string", () => {
     expect(parseTextStructure("")).to.deep.equal({});
