@@ -1,20 +1,21 @@
 export function parser(text) {
-  let object = {}
-  let result = ""
+  let object = {};
+  let result = "";
   const stringToParse = text.trim();
   object = parseTextStructure(stringToParse);
   result = parseObjectToOutput(object);
 
   const isEmptyObject = Object.keys(object).length === 0;
-  console.log(result)
-  if (isEmptyObject || object === undefined || object.error ||result === "") {
-   //debugger;
-
-    return "Unable to parse your input. Please ensure you're passing the correct var_dump output. Double-check the format and try again."
-  } else if(object.error) {
-    return object.error
+  console.log(object, result);
+  if (isEmptyObject || object === undefined || object.error || result === "") {
+    return "Unable to parse your input. Please ensure you're passing the correct var_dump output. Double-check the format and try again.";
+  } else if (object.error) {
+    console.log('here')
+    return "Unable to parse your input. Please ensure you're passing the correct var_dump output. Double-check the format and try again.";
   }
-  return object.type === 'array' ? `$output[] \n $output` + result : '$output' + result;
+  return object.type === "array"
+    ? `$output[]\n$output` + result
+    : "$output" + result;
 }
 
 //#region nested array extraction
@@ -59,13 +60,13 @@ export function parseTextStructure(t) {
       inString = text.charAt(i) === '"' ? !inString : inString;
 
       if (!inString) {
-        //#region NULL 
+        //#region NULL
         if (newText.startsWith("NULL")) {
           const textBeforeINull = text.slice(0, i);
           const keyNull =
             textBeforeINull === ""
               ? null
-              : textBeforeINull.match(lastKeyPattern)[1].replace(/\"/g, "");
+              : textBeforeINull.match(lastKeyPattern)[1];
 
           output =
             textBeforeINull === ""
@@ -82,7 +83,7 @@ export function parseTextStructure(t) {
           const keyString =
             textBeforeIString === ""
               ? null
-              : textBeforeIString.match(lastKeyPattern)[1].replace(/\"/g, "");
+              : textBeforeIString.match(lastKeyPattern)[1];
           const stringValue = newText
             .match(stringValuePattern)[0]
             .replace(/"/g, "");
@@ -100,7 +101,7 @@ export function parseTextStructure(t) {
           const keyInt =
             textBeforeInt === ""
               ? null
-              : textBeforeInt.match(lastKeyPattern)[1].replace(/\"/g, "");
+              : textBeforeInt.match(lastKeyPattern)[1];
           const intValue = newText.match(otherValuePattern)[1];
           output =
             textBeforeInt === ""
@@ -109,14 +110,14 @@ export function parseTextStructure(t) {
                   ...output,
                   [keyInt]: { type: "int", value: parseInt(intValue) },
                 };
-                //#endregion
-                //#region float
+          //#endregion
+          //#region float
         } else if (newText.startsWith("float")) {
           const textBeforeIFloat = text.slice(0, i);
           const keyFloat =
             textBeforeIFloat === ""
               ? null
-              : textBeforeIFloat.match(lastKeyPattern)[1].replace(/\"/g, "");
+              : textBeforeIFloat.match(lastKeyPattern)[1];
           const floatValue = newText.match(otherValuePattern)[1];
           output =
             textBeforeIFloat === ""
@@ -125,14 +126,14 @@ export function parseTextStructure(t) {
                   ...output,
                   [keyFloat]: { type: "float", value: parseFloat(floatValue) },
                 };
-                //#endregion
-                //#region bool
+          //#endregion
+          //#region bool
         } else if (newText.startsWith("bool")) {
           const textBeforeIBool = text.slice(0, i);
           const keyBool =
             textBeforeIBool === ""
               ? null
-              : textBeforeIBool.match(lastKeyPattern)[1].replace(/\"/g, "");
+              : textBeforeIBool.match(lastKeyPattern)[1];
           const boolValue = newText.match(otherValuePattern)[1];
 
           output =
@@ -148,8 +149,8 @@ export function parseTextStructure(t) {
                     value: boolValue === "true" ? true : false,
                   },
                 };
-                //#endregion
-                //#region array
+          //#endregion
+          //#region array
         } else if (newText.startsWith("array")) {
           const textBeforeIArr = text.slice(0, i);
           const arrayTypeLength = newText.match(arrayTypePattern)[0]
@@ -158,7 +159,7 @@ export function parseTextStructure(t) {
           const keyArray =
             textBeforeIArr === ""
               ? null
-              : textBeforeIArr.match(lastKeyPattern)[1].replace(/\"/g, "");
+              : textBeforeIArr.match(lastKeyPattern)[1];
           const arrayContent = extractNestedBrackets(newText);
           output =
             textBeforeIArr === ""
@@ -199,6 +200,8 @@ function parseObjectToOutput(obj, prefix = "") {
       output.push(nestParsValue);
     }
   }
-  return output.join("\n $output");
+  return output.join("\n$output");
 }
 //#endregion
+//mozliwosc kopiowania
+//nowy projekt, kaledarz googla widok miesiąca, tygodnia i dnia

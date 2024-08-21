@@ -52,139 +52,51 @@ const example2 = `array(3) {
   }
 }`;
 
-const result1 = {
-  type: "array",
-  value: {
-    klucz: {
-      type: "string",
-      value: "wartosc",
-    },
-    klucz_bool: {
-      type: "bool",
-      value: true,
-    },
-    klucz_float: {
-      type: "float",
-      value: 6.34,
-    },
-    klucz_integer: {
-      type: "int",
-      value: 2,
-    },
-  },
-};
-const result2 = {
-  type: "array",
-  value: {
-    0: {
-      type: "array",
-      value: {
-        0: {
-          type: "array",
-          value: {
-            zagniezdzony_klucz: {
-              type: "string",
-              value: "array(3)",
-            },
-            zagniezdzony_bool: {
-              type: "bool",
-              value: true,
-            },
-            zagniezdzony_float: {
-              type: "float",
-              value: 6.34,
-            },
-          },
-        },
-        1: {
-          type: "array",
-          value: {
-            zagniezdzony_klucz: {
-              type: "string",
-              value: "zagniezdzona_wartosc2",
-            },
-            zagniezdzony_bool: {
-              type: "bool",
-              value: false,
-            },
-            zagniezdzony_float: {
-              type: "float",
-              value: 1.34,
-            },
-            zagniezdzony_null: {
-              type: "null",
-              value: null,
-            },
-          },
-        },
-      },
-    },
-    klucz: {
-      type: "string",
-      value: "wartosc",
-    },
-    moje_liczby: {
-      type: "array",
-      value: {
-        0: {
-          type: "int",
-          value: 3,
-        },
-        1: {
-          type: "int",
-          value: 4,
-        },
-        2: {
-          type: "int",
-          value: 1,
-        },
-        3: {
-          type: "int",
-          value: 5,
-        },
-        4: {
-          type: "int",
-          value: 7,
-        },
-      },
-    },
-  },
-};
+const result1 = `$output[]
+$output["klucz"] = 'wartosc'
+$output["klucz_bool"] = true
+$output["klucz_float"] = 6.34
+$output["klucz_integer"] = 2`;
+
+const result2 = `$output[]
+$output[0][0]["zagniezdzony_klucz"] = 'array(3)'
+$output[0][0]["zagniezdzony_bool"] = true
+$output[0][0]["zagniezdzony_float"] = 6.34
+$output[0][1]["zagniezdzony_klucz"] = 'zagniezdzona_wartosc2'
+$output[0][1]["zagniezdzony_bool"] = false
+$output[0][1]["zagniezdzony_float"] = 1.34
+$output[0][1]["zagniezdzony_null"] = null
+$output["klucz"] = 'wartosc'
+$output["moje_liczby"][0] = 3
+$output["moje_liczby"][1] = 4
+$output["moje_liczby"][2] = 1
+$output["moje_liczby"][3] = 5
+$output["moje_liczby"][4] = 7`;
 
 describe("parse text to object test", () => {
-
   it("should return correct value in case of simple objects", () => {
-    expect(parseTextStructure(`string(11) "Hello world"`)).to.deep.equal({
-      type: "string",
-      value: "Hello world",
-    });
-    expect(parseTextStructure(`float(3.3)`)).to.deep.equal({
-      type: "float",
-      value: 3.3,
-    });
-    expect(parseTextStructure(`int(15)`)).to.deep.equal({
-      type: "int",
-      value: 15,
-    });
-    expect(parseTextStructure(`NULL`)).to.deep.equal({
-      type: "null",
-      value: null,
-    });
-    expect(parseTextStructure(`bool(false)`)).to.deep.equal({
-      type: "bool",
-      value: false,
-    });
-    expect(parseTextStructure(example1)).to.deep.equal(result1);
+    expect(parser(`string(11) "Hello world"`)).to.equal(
+      '$output = Hello world'
+    );
+    expect(parser(`float(3.3)`)).to.equal("$output = 3.3");
+    expect(parser(`int(15)`)).to.equal("$output = 15");
+    expect(parser(`NULL`)).to.equal("$output = null");
+    expect(parser(`bool(false)`)).to.equal("$output = false");
+    expect(parser(example1)).to.equal(result1);
   });
   it("should return correct value in case of nested objects", () => {
-    expect(parseTextStructure(example2)).to.deep.equal(result2);
+    expect(parser(example2)).to.equal(result2);
   });
-  it("should return error value when incorrectly formated input", () => {
-    expect(
-      parseTextStructure(`array {"klucz"=>string(7) "wartosc"`)
-    ).to.deep.equal({ error: "Failed to parse text structure." });
+  it("should return error text when incorrectly formated input", () => {
+    expect(parser(`array {"klucz"=>string(7) "wartosc"`)).to.equal(
+      "Unable to parse your input. Please ensure you're passing the correct var_dump output. Double-check the format and try again."
+    );
   });
-  it("should return empty object when empty string", () => {
-    expect(parseTextStructure("")).to.deep.equal({});
+  it("should return correct text when string starts with non printable sighs", () => {
+    expect(parser(`\n\n\n\r\r\s\sarray(4) {["klucz_float"]=> float(6.34)`)).to.equal(
+      "Unable to parse your input. Please ensure you're passing the correct var_dump output. Double-check the format and try again."
+    );
   });
+
+  
 });
